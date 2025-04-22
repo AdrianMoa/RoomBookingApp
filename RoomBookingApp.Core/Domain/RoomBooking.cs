@@ -6,5 +6,6 @@ namespace RoomBookingApp.Core.Domain
     {
         // Additional properties and methods specific to RoomBooking can be added here
         public int RoomId { get; set; }
+        public int? Id { get; set; }
     }
 }

@@ -71,7 +71,7 @@ namespace RoomBookingApp.Core
             savedBooking.FullName.ShouldBe(_request.FullName);
             savedBooking.Email.ShouldBe(_request.Email);
             savedBooking.Date.ShouldBe(_request.Date);
-            savedBooking.RoomId.ShouldBe(_availableRooms[0].Id);
+            savedBooking.RoomId.ShouldBe(_availableRooms.First().Id);
         }
 
         [Fact]
@@ -95,6 +95,28 @@ namespace RoomBookingApp.Core
 
             var result = _processor.BookRoom(_request);
             bookingSuccessFlag.ShouldBe(result.Flag);
+        }
+
+        [Theory]
+        [InlineData(1, true)]
+        [InlineData(null, false)]
+        public void Should_Return_RoomBookingId_In_Result(int? roomBookingId, bool isAvailable)
+        {
+            if (!isAvailable)
+            {
+                _availableRooms.Clear();
+            }
+            else
+            {
+                _roomBookingServiceMock
+                    .Setup(s => s.Save(It.IsAny<RoomBooking>()))
+                    .Callback<RoomBooking>(booking =>
+                    {
+                        booking.Id = roomBookingId.Value;
+                    });
+                var result = _processor.BookRoom(_request);
+                result.RoomBookingId.ShouldBe(roomBookingId);
+            }
         }
     }
 }
